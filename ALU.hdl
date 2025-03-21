@@ -1,0 +1,50 @@
+// This file implements the Hack ALU as per the Nand2Tetris specifications.
+
+CHIP ALU {
+    IN  
+        x[16], y[16],    // Two 16-bit data inputs
+        zx,              // Zero x input
+        nx,              // Negate x input
+        zy,              // Zero y input
+        ny,              // Negate y input
+        f,               // Function selector (1: Add, 0: AND)
+        no;              // Negate output
+
+    OUT 
+        out[16],         // 16-bit output
+        zr,              // Zero flag (1 if out == 0)
+        ng;              // Negative flag (1 if out < 0)
+
+    PARTS:
+        // Apply zx: if zx == 1, set x to 0000000000000000
+        Mux16(a=x, b=false, sel=zx, out=xZeroed);
+        
+        // Apply nx: if nx == 1, negate x
+        Not16(in=xZeroed, out=notX);
+        Mux16(a=xZeroed, b=notX, sel=nx, out=xProcessed);
+
+        // Apply zy: if zy == 1, set y to 0000000000000000
+        Mux16(a=y, b=false, sel=zy, out=yZeroed);
+        
+        // Apply ny: if ny == 1, negate y
+        Not16(in=yZeroed, out=notY);
+        Mux16(a=yZeroed, b=notY, sel=ny, out=yProcessed);
+
+        // Perform the required function: Add or AND
+        Add16(a=xProcessed, b=yProcessed, out=added);
+        And16(a=xProcessed, b=yProcessed, out=anded);
+        Mux16(a=anded, b=added, sel=f, out=aluOut);
+
+        // Apply no: if no == 1, negate the output
+        Not16(in=aluOut, out=notAluOut);
+        Mux16(a=aluOut, b=notAluOut, sel=no, out=out);
+
+        // Compute zr: 1 if out is all zeros, else 0
+        Or8Way(in=out[0..7], out=orLow);
+        Or8Way(in=out[8..15], out=orHigh);
+        Or(a=orLow, b=orHigh, out=orResult);
+        Not(in=orResult, out=zr);
+
+        // Compute ng: 1 if out is negative (i.e., MSB is 1)
+        And(a=out[15], b=true, out=ng);
+}
