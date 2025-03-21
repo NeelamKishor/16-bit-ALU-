@@ -26,3 +26,7 @@ This project is a **16-bit Arithmetic Logic Unit (ALU)** implemented in **Logisi
 ## Circuit User Interface
 
 ![Screenshot (859)](https://github.com/user-attachments/assets/d219881b-458e-4dc4-8608-cd61fb5a7616)
+
+## 📖 References
+- **The Elements of Computing Systems (Nand2Tetris) by Noam Nisan & Shimon Schocken**
+- **Nand2Tetris Course**
